@@ -37,7 +37,7 @@ static PyObject * THPVariable__parse_to(PyObject* module, PyObject* args, PyObje
     PyTuple_SET_ITEM(tuple.get(), 0, Py_None);
   }
   if (scalarType) {
-    PyTuple_SET_ITEM(tuple.get(), 1, torch::autograd::utils::wrap(torch::getDtype(*scalarType)));
+    PyTuple_SET_ITEM(tuple.get(), 1, torch::autograd::utils::wrap(torch::getTHPDtype(*scalarType)));
   } else {
     Py_INCREF(Py_None);
     PyTuple_SET_ITEM(tuple.get(), 1, Py_None);
@@ -53,7 +53,9 @@ static PyObject * THPVariable__parse_to(PyObject* module, PyObject* args, PyObje
   END_HANDLE_TH_ERRORS
 }
 
-${py_methods}
+// generated forward declarations start here
+
+${py_forwards}
 
 static PyMethodDef nn_functions[] = {
   {"_parse_to", (PyCFunction)(void(*)(void))THPVariable__parse_to, METH_VARARGS | METH_KEYWORDS, nullptr},
@@ -61,11 +63,9 @@ static PyMethodDef nn_functions[] = {
   {NULL}
 };
 
+static PyObject* THPNNVariableFunctionsModule = NULL;
+
 void initNNFunctions(PyObject* module) {
-#if PY_MAJOR_VERSION == 2
-  PyObject* nn = Py_InitModule("torch._C._nn", nn_functions);
-  Py_XINCREF(nn);  // Py_InitModule returns "borrowed" reference
-#else
   static struct PyModuleDef def = {
      PyModuleDef_HEAD_INIT,
      "torch._C._nn",
@@ -74,7 +74,7 @@ void initNNFunctions(PyObject* module) {
      nn_functions
   };
   PyObject* nn = PyModule_Create(&def);
-#endif
+  THPNNVariableFunctionsModule = nn;
   if (!nn) {
     throw python_error();
   }
@@ -83,5 +83,9 @@ void initNNFunctions(PyObject* module) {
     throw python_error();
   }
 }
+
+// generated methods start here
+
+${py_methods}
 
 }} // namespace torch::autograd
